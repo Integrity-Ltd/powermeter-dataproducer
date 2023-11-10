@@ -95,7 +95,7 @@ async function createNewDb(dbFileName: string): Promise<[Database, Statement]> {
 async function insertMeasurements(db: Database, stmt: Statement, measuredValue: number, hourlyIterator: dayjs.Dayjs): Promise<void> {
     let promises: Promise<void>[] = [];
     for (let channel = 1; channel <= 12; channel++) {
-        promises.push(execStatement(stmt, [channel, measuredValue, hourlyIterator.unix()]));
+        promises.push(execStatement(stmt, [channel, measuredValue + (Math.round((Math.random() * 100) * 10) / 10), hourlyIterator.unix()]));
     }
     await Promise.all(promises);
 }
@@ -109,8 +109,8 @@ async function insertMeasurements(db: Database, stmt: Statement, measuredValue: 
  */
 async function generateMeasurements(year: number, generatedYears: number, timeZone: string) {
 
-    let hourlyIterator = dayjs.tz(year + "01-01", timeZone);
-    let endOfYear = dayjs.tz(year + generatedYears + "01-01", timeZone);
+    let hourlyIterator = dayjs(year + "01-01");
+    let endOfYear = dayjs(year + generatedYears + "01-01");
     let measuredValue = 0;
     let db: Database | null = null;
     let stmt: Statement | null = null;
@@ -147,6 +147,6 @@ async function generateMeasurements(year: number, generatedYears: number, timeZo
     }
 }
 
-generateMeasurements(2023, 2, dayjs.tz.guess()).catch((reason) => {
+generateMeasurements(2022, 2, dayjs.tz.guess()).catch((reason) => {
     console.error(reason);
 }).then(() => console.log("Factoring finished."));
